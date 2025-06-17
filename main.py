@@ -12,7 +12,7 @@ def main():
 
     # Canvas
     sim_canvas = SimulationCanvas(root, width = 600, height = 400)
-    sim_canvas.pack()
+    sim_canvas.pack(pady = 10)
 
     # Stats label or graph placeholder
     stats_label = tk.Label(root, text = "S: 0 | I: 0 | R:0")
@@ -20,5 +20,5 @@ def main():
 
     root.mainloop()
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
