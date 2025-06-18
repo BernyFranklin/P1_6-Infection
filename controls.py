@@ -4,7 +4,7 @@ from tkinter import ttk
 def create_controls(parent):
     outer_frame = ttk.Frame(parent, padding = "10")
     flex_frame = ttk.Frame(outer_frame)
-    flex_frame.pack(side = "top", fill = "x")
+    flex_frame.pack(anchor = "center", pady = 5)
 
     # Dummy parameter dictionary
     params = {
