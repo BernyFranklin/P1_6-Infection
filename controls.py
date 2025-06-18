@@ -13,15 +13,19 @@ def create_controls(parent):
         "Movement Speed": tk.DoubleVar(value = 2.0)
     }
 
-    row = 0
+    # User Input Section (Rows 0 and 1)
+    col = 0
     for label, var in params.items():
-        ttk.Label(frame, text = label).grid(row = row, column = 0, sticky = "w")
-        ttk.Entry(frame, textvariable = var, width = 10).grid(row = row, column = 1, padx = 5)
-        row += 1
+        ttk.Label(frame, text = label).grid(row = 0, column = col, sticky = "w", padx = 5)
+        ttk.Entry(frame, textvariable = var, width = 10).grid(row = 1, column = col, padx = 5)
+        col += 1
     
-    # Dummy Buttons
-    ttk.Button(frame, text = "Start", command=lambda: print("Start")).grid(row = 0, column = 2, padx = 10)
-    ttk.Button(frame, text = "Pause", command=lambda: print("Pause")).grid(row = 1, column = 2, padx = 10)
-    ttk.Button(frame, text = "Reset", command=lambda: print("Reset")).grid(row = 2, column = 2, padx = 10)
+    # Spacer Row (Row 2)
+    ttk.Label(frame, text = "").grid(row = 2, column = 0, pady = 10)
+
+    # Dummy Buttons (Row 3)
+    ttk.Button(frame, text = "Start", command=lambda: print("Start")).grid(row = 3, column = 1, padx = 5)
+    ttk.Button(frame, text = "Pause", command=lambda: print("Pause")).grid(row = 3, column = 2, padx = 5)
+    ttk.Button(frame, text = "Reset", command=lambda: print("Reset")).grid(row = 3, column = 3, padx = 5)
 
     return frame, params
