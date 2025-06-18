@@ -7,8 +7,8 @@ from graph import SIRGraph
 def main():
     # Set up root
     root = tk.Tk()
-    root.title("SIR Infection Simulation")            # Window Size
-    root.resizable(False, False)
+    root.title("SIR Infection Simulation")
+    root.resizable(True, True)                  # Needs to be True for use on laptop displays, otherwise its tiny
     root.grid_rowconfigure(1, weight = 1)
     root.grid_columnconfigure(0, weight = 1)
 
