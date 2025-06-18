@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 
 def create_controls(parent):
-    frame = ttk.Frame(parent, padding = "10")
+    outer_frame = ttk.Frame(parent, padding = "10")
+    flex_frame = ttk.Frame(outer_frame)
+    flex_frame.pack(side = "top", fill = "x")
 
     # Dummy parameter dictionary
     params = {
@@ -13,19 +15,19 @@ def create_controls(parent):
         "Movement Speed": tk.DoubleVar(value = 2.0)
     }
 
-    # User Input Section (Rows 0 and 1)
-    col = 0
+    # User Input Section
     for label, var in params.items():
-        ttk.Label(frame, text = label).grid(row = 0, column = col, sticky = "w", padx = 5)
-        ttk.Entry(frame, textvariable = var, width = 10).grid(row = 1, column = col, padx = 5)
-        col += 1
+        group = ttk.Frame(flex_frame)
+        group.pack(side = "left", padx = 5)
+        ttk.Label(group, text = label).pack(anchor = "w")
+        ttk.Entry(group, textvariable = var, width = 10).pack()
     
-    # Spacer Row (Row 2)
-    ttk.Label(frame, text = "").grid(row = 2, column = 0, pady = 10)
+    # Dummy Buttons 
+    button_group = ttk.Frame(flex_frame)
+    button_group.pack(side = "left", padx = 20)
 
-    # Dummy Buttons (Row 3)
-    ttk.Button(frame, text = "Start", command=lambda: print("Start")).grid(row = 3, column = 1, padx = 5)
-    ttk.Button(frame, text = "Pause", command=lambda: print("Pause")).grid(row = 3, column = 2, padx = 5)
-    ttk.Button(frame, text = "Reset", command=lambda: print("Reset")).grid(row = 3, column = 3, padx = 5)
+    ttk.Button(button_group, text = "Start", command=lambda: print("Start")).pack(side = "left", padx = 2)
+    ttk.Button(button_group, text = "Pause", command=lambda: print("Pause")).pack(side = "left", padx = 2)
+    ttk.Button(button_group, text = "Reset", command=lambda: print("Reset")).pack(side = "left", padx = 2)
 
-    return frame, params
+    return outer_frame, params
