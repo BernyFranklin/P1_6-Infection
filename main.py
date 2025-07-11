@@ -3,6 +3,7 @@ from tkinter import ttk
 from controls import create_controls
 from simulation_canvas import SimulationCanvas
 from graph import SIRGraph
+from simulation_engine import SIRSimulation
 
 def main():
     # Set up root
@@ -30,6 +31,19 @@ def main():
     # Graph on the right
     graph = SIRGraph(sim_and_graph)
     graph.grid(row = 0, column = 1, sticky = "nsew", padx = 10)
+
+    # Initialize simulation engine
+    simulation = SIRSimulation(width = 400, height = 700)
+    simulation.population_size = int(params["Population Size"].get())
+    simulation.initial_infected = int(params["Initial Infected"].get())
+    simulation.infection_rate = float(params["Infection Rate"].get())
+    simulation.recovery_time = int(params["Recovery Time"].get())
+    simulation.movement_speed = float(params["Movement Speed"].get())
+    simulation.initialize_population()
+
+    # Debug print to confirm values
+    s, i, r = simulation.count_states()
+    print(f"Initial counts - S: {s}, I: {i}, R: {r}")
 
     # Stats label or graph placeholder
     status_label = tk.Label(root, text = "Time: 0 | S: 0 | I: 0 | R: 0", padx = 5)
