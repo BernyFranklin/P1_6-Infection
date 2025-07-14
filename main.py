@@ -10,7 +10,7 @@ def main():
     # Set up root
     root = tk.Tk()
     pygame.mixer.init()
-    pygame.mixer.music.load("retro-game-music-245230.mp3")
+    pygame.mixer.music.load("12a Athletic.mp3")
     root.title("SIR Infection Simulation")
     root.resizable(True, True)                  # Needs to be True for use on laptop displays, otherwise its tiny
     root.grid_rowconfigure(1, weight = 1)
