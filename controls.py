@@ -28,10 +28,15 @@ def create_controls(parent):
     button_group = ttk.Frame(flex_frame)                            # Buttons belong to the same frame
     button_group.pack(side = "left", padx = 20)                     # Left oriented with some space from the user input
 
-    # Actual buttons that print their command when pressed, this will be modified later
-    ttk.Button(button_group, text = "Start", command=lambda: print("Start")).pack(side = "left", padx = 2)
-    ttk.Button(button_group, text = "Pause", command=lambda: print("Pause")).pack(side = "left", padx = 2)
-    ttk.Button(button_group, text = "Reset", command=lambda: print("Reset")).pack(side = "left", padx = 2)
+    # Buttons
+    start_button = ttk.Button(button_group, text = "Start")
+    start_button.pack(side = "left", padx = 2)
+
+    pause_button = ttk.Button(button_group, text = "Pause")
+    pause_button.pack(side = "left", padx = 2)
+
+    reset_button = ttk.Button(button_group, text = "Reset")
+    reset_button.pack(side = "left", padx = 2)
 
     # Return the control center
-    return outer_frame, params
+    return outer_frame, params, start_button, pause_button, reset_button
