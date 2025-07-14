@@ -21,22 +21,28 @@ def main():
     controls_frame.grid(row = 0, column = 0, sticky = "ew", padx = 10, pady = (10, 5))
 
     # Set up simulation and graph area
-    sim_and_graph = ttk.Frame(root, padding = 10)
+    sim_and_graph = ttk.Frame(root, padding = 0)
     sim_and_graph.grid(row = 1, column = 0)
     sim_and_graph.grid_columnconfigure(0, weight = 1)
     sim_and_graph.grid_columnconfigure(1, weight = 1)
     sim_and_graph.grid_rowconfigure(0, weight = 1)
 
-    # Canvas on the left
-    canvas = SimulationCanvas(sim_and_graph)
-    canvas.grid(row = 0, column = 0, sticky = "nsew", padx = (10, 20))
+    # Simulation Canvas on the left
+    canvas_width = 275
+    canvas_height = 650
+    canvas_frame = ttk.Frame(sim_and_graph, width = canvas_width + 5, height = canvas_height + 5)
+    canvas_frame.grid(row = 0, column = 0, sticky = "nsew", padx = 10)
+    canvas_frame.grid_propagate(False)
+    canvas = SimulationCanvas(canvas_frame)
+    canvas.place(x = 0, y = 0, width= canvas_width, height= canvas_height)
+    #canvas.pack(fill = "both", expand = True)
 
     # Graph on the right
     graph = SIRGraph(sim_and_graph)
     graph.grid(row = 0, column = 1, sticky = "nsew", padx = 10)
 
     # Initialize simulation engine
-    simulation = SIRSimulation(width = 400, height = 700)
+    simulation = SIRSimulation(width = canvas_width, height = canvas_height)
     simulation.population_size = int(params["Population Size"].get())
     simulation.initial_infected = int(params["Initial Infected"].get())
     simulation.infection_rate = float(params["Infection Rate"].get())
@@ -46,7 +52,6 @@ def main():
 
     # Debug print to confirm values
     s, i, r = simulation.count_states()
-    print(f"Initial counts - S: {s}, I: {i}, R: {r}")
 
     # Stats label or graph placeholder
     status_label = tk.Label(root, text = "Time: 0 | S: 0 | I: 0 | R: 0", padx = 5)
@@ -115,13 +120,6 @@ def main():
         canvas.delete("all")
         graph.clear()
         status_label.config(text = "Time: 0 | S: 0 | I: 0 | R: 0")
-        simulation.population_size = int(params["Population Size"].get())
-        simulation.initial_infected = int(params["Initial Infected"].get())
-        simulation.infection_rate = float(params["Infection Rate"].get())
-        simulation.recovery_time = int(params["Recovery Time"].get())
-        simulation.movement_speed = float(params["Movement Speed"].get())
-        simulation.initialize_population()
-        draw_agents()
 
     start_btn.config(command = start)
     pause_btn.config(command = pause)

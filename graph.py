@@ -10,8 +10,8 @@ class SIRGraph(tk.Frame):
         super().__init__(parent)
 
         # Create a figure and axis
-        self.fig, self.ax = plt.subplots(figsize = (5, 3.5), dpi = 100)
-        self.fig.tight_layout()
+        self.fig, self.ax = plt.subplots(figsize = (5, 3.5), dpi = 100, constrained_layout = True)
+        #self.fig.tight_layout()
         self.ax.set_title("SIR Model Over Time", fontsize = 10)
         self.ax.set_xlabel("Time Steps", fontsize = 9)
         self.ax.set_ylabel("Population", fontsize = 9)
@@ -48,15 +48,6 @@ class SIRGraph(tk.Frame):
         self.ax.set_xlim(0, max(100, time_step))
         self.ax.set_ylim(0, max(self.s_data + self.i_data + self.r_data) + 10)
 
-    def update_graph(self, new_s, new_i, new_r):
-        """Call this with new y-data lists to update graph"""
-        if len(new_s) != len(self.x_data):
-            print("[SIRGraph] Warning: Data length mismatch")
-            return
-        
-        self.s_line.set_ydata(new_s)
-        self.i_line.set_ydata(new_i)
-        self.r_line.set_ydata(new_r)
         self.canvas.draw()
 
     def clear(self):
