@@ -14,7 +14,7 @@ def main():
     root.grid_columnconfigure(0, weight = 1)
 
     # Controls on top
-    controls_frame, params = create_controls(root)
+    controls_frame, params, start_btn, pause_btn, reset_btn  = create_controls(root)
     controls_frame.grid(row = 0, column = 0, sticky = "ew", padx = 10, pady = (10, 5))
 
     # Set up simulation and graph area
@@ -48,6 +48,69 @@ def main():
     # Stats label or graph placeholder
     status_label = tk.Label(root, text = "Time: 0 | S: 0 | I: 0 | R: 0", padx = 5)
     status_label.grid(row = 2, column = 0, sticky = "w", padx = 10)
+
+    # Loop for sim state and animation logic. ***Move later***
+    # Trackiong loop state
+    running = False
+    time_step = 0
+    loop_id = None      # after() id to cancel the loop
+
+    # Agent drawing function
+    def draw_agents():
+        canvas.delete("agent")
+        for agent in simulation.population:
+            color = {"S": "blue", "I": "red", "R": "green"}[agent.state]
+            radius = 3
+            canvas.create_oval(
+                agent.x - radius, agent.y - radius,
+                agent.x + radius, agent.y + radius,
+                fill = color, outline = "", tags = "agent"
+            )
+
+    def update():
+        nonlocal time_step, loop_id
+        simulation.update()
+        draw_agents()
+        s, i, r = simulation.count_states()
+        graph.add_points(time_step, s, i, r)
+        status_label.config(text = f"Time: {time_step} | S: {s} | I: {i} | R: {r}")
+        time_step += 1
+        loop_id = root.after(33, update)
+
+    def start():
+        nonlocal running, loop_id, time_step
+        if not running:
+            running = True
+            time_step = 0
+            update()
+
+    def pause():
+        nonlocal running, loop_id 
+        if running and loop_id:
+            root.after_cancel(loop_id)
+            loop_id = None 
+            running = False
+
+    def reset():
+        nonlocal running, loop_id, time_step
+        if running and loop_id:
+            root.after_cancel(loop_id)
+        running = False
+        time_step = 0
+        canvas.delete("all")
+        graph.clear()
+        status_label.config(text = "Time: 0 | S: 0 | I: 0 | R: 0")
+        simulation.population_size = int(params["Population Size"].get())
+        simulation.initial_infected = int(params["Initial Infected"].get())
+        simulation.infection_rate = float(params["Infection Rate"].get())
+        simulation.recovery_time = int(params["Recovery Time"].get())
+        simulation.movement_speed = float(params["Movement Speed"],get())
+        simulation.initialize_population()
+        draw_agents()
+
+    start_btn.config(command = start)
+    pause_btn.config(command = pause)
+    reset_btn.config(command = reset)
 
     root.mainloop()
 
