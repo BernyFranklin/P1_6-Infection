@@ -1,0 +1,334 @@
+-- main.py
+import tkinter as tk
+import pygame
+from tkinter import ttk
+from controls import create_controls
+from simulation_canvas import SimulationCanvas
+from graph import SIRGraph
+from simulation_engine import SIRSimulation
+
+def main():
+    # Set up root
+    root = tk.Tk()
+    pygame.mixer.init()
+    pygame.mixer.music.load("12a Athletic.mp3")
+    root.title("SIR Infection Simulation")
+    root.resizable(True, True)                  # Needs to be True for use on laptop displays, otherwise its tiny
+    root.grid_rowconfigure(1, weight = 1)
+    root.grid_columnconfigure(0, weight = 1)
+
+    # Controls on top
+    controls_frame, params, start_btn, pause_btn, reset_btn  = create_controls(root)
+    controls_frame.grid(row = 0, column = 0, sticky = "ew", padx = 10, pady = (10, 5))
+
+    # Set up simulation and graph area
+    sim_and_graph = ttk.Frame(root, padding = 10)
+    sim_and_graph.grid(row = 1, column = 0)
+    sim_and_graph.grid_columnconfigure(0, weight = 1)
+    sim_and_graph.grid_columnconfigure(1, weight = 1)
+    sim_and_graph.grid_rowconfigure(0, weight = 1)
+
+    # Canvas on the left
+    canvas = SimulationCanvas(sim_and_graph)
+    canvas.grid(row = 0, column = 0, sticky = "nsew", padx = (10, 20))
+
+    # Graph on the right
+    graph = SIRGraph(sim_and_graph)
+    graph.grid(row = 0, column = 1, sticky = "nsew", padx = 10)
+
+    # Initialize simulation engine
+    simulation = SIRSimulation(width = 400, height = 700)
+    simulation.population_size = int(params["Population Size"].get())
+    simulation.initial_infected = int(params["Initial Infected"].get())
+    simulation.infection_rate = float(params["Infection Rate"].get())
+    simulation.recovery_time = int(params["Recovery Time"].get())
+    simulation.movement_speed = float(params["Movement Speed"].get())
+    simulation.initialize_population()
+
+    # Debug print to confirm values
+    s, i, r = simulation.count_states()
+    print(f"Initial counts - S: {s}, I: {i}, R: {r}")
+
+    # Stats label or graph placeholder
+    status_label = tk.Label(root, text = "Time: 0 | S: 0 | I: 0 | R: 0", padx = 5)
+    status_label.grid(row = 2, column = 0, sticky = "w", padx = 10)
+
+    # Loop for sim state and animation logic. ***Move later***
+    # Trackiong loop state
+    running = False
+    time_step = 0
+    loop_id = None      # after() id to cancel the loop
+
+    # Agent drawing function
+    def draw_agents():
+        canvas.delete("agent")
+        for agent in simulation.population:
+            color = {"S": "blue", "I": "red", "R": "green"}[agent.state]
+            radius = 3
+            canvas.create_oval(
+                agent.x - radius, agent.y - radius,
+                agent.x + radius, agent.y + radius,
+                fill = color, outline = "", tags = "agent"
+            )
+
+    def update():
+        nonlocal time_step, loop_id
+        simulation.update()
+        draw_agents()
+        s, i, r = simulation.count_states()
+        #graph.add_points(time_step, s, i, r)
+        status_label.config(text = f"Time: {time_step} | S: {s} | I: {i} | R: {r}")
+        time_step += 1
+        loop_id = root.after(33, update)
+
+    def start():
+        nonlocal running, loop_id, time_step
+        if not running:
+            if time_step == 0:
+                simulation.population_size = int(params["Population Size"].get())
+                simulation.initial_infected = int(params["Initial Infected"].get())
+                simulation.infection_rate = float(params["Infection Rate"].get())
+                simulation.recovery_time = int(params["Recovery Time"].get())
+                simulation.movement_speed = float(params["Movement Speed"].get())
+                simulation.initialize_population()
+                draw_agents()
+                pygame.mixer.music.play(-1)
+            else:
+                pygame.mixer.music.unpause()
+            running = True
+            update()
+
+    def pause():
+        nonlocal running, loop_id 
+        if running and loop_id:
+            root.after_cancel(loop_id)
+            pygame.mixer.music.pause()
+            loop_id = None 
+            running = False
+
+    def reset():
+        nonlocal running, loop_id, time_step
+        if running and loop_id:
+            root.after_cancel(loop_id)
+        running = False
+        pygame.mixer.music.stop()
+        time_step = 0
+        canvas.delete("all")
+        graph.clear()
+        status_label.config(text = "Time: 0 | S: 0 | I: 0 | R: 0")
+        simulation.population_size = int(params["Population Size"].get())
+        simulation.initial_infected = int(params["Initial Infected"].get())
+        simulation.infection_rate = float(params["Infection Rate"].get())
+        simulation.recovery_time = int(params["Recovery Time"].get())
+        simulation.movement_speed = float(params["Movement Speed"],get())
+        simulation.initialize_population()
+        draw_agents()
+
+    start_btn.config(command = start)
+    pause_btn.config(command = pause)
+    reset_btn.config(command = reset)
+
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
+
+-- simulation_engine.py 
+import random
+import math
+
+class Agent:
+    def __init__(self, x, y, dx, dy, state = 'S'):
+        self.x = x                      # horizontal position
+        self.y = y                      # vertical position
+        self.dx = dx                    # horizontal movement speed
+        self.dy = dy                    # vertical movement speed
+        self.state = state              # 'S' (Susceptible), 'I' (Infected), 'R' (Recovered)
+        self.infection_timer = 0        # Counts how long the agent has been infected
+
+    def move(self, width, height):
+        # Moves the agent, bouncing off walls if hitting canvas boundaries
+        self.x += self.dx
+        self.y += self.dy
+
+        # Bounce on left/right wall
+        if self.x <= 0 or self.x >= width:
+            self.dx *= -1
+        
+        # Boounce on top/bottom wall
+        if self.y <= 0 or self.y >= height:
+            self.dy *= -1
+
+    def infect(self):
+        # Sets the agent's state to infected if they are susceptible
+        if self.state == 'S':
+            self.state = 'I'
+            self.infection_timer = 0
+
+    def recover(self):
+         # Sets the agent's state to recovered if they are infected
+         if self.state == 'I':
+             self.state = 'R'
+
+class SIRSimulation:
+    def __init__(self, width, height):
+        self.width = width          # Canvas width
+        self.height = height        # Canvas height
+        self.population = []        # List of Agent objects
+
+        # Simulation parameters (default until set externally)
+        self.infection_rate = 0.1
+        self.recovery_time = 100
+        self.movement_speed = 2
+        self.infection_distance = 10
+        self.initial_infected = 1
+        self.population_size = 100
+
+    def initialize_population(self):
+        # Creates a new population of agents with random positions and directions
+        self.population.clear()
+        for i in range(self.population_size):
+            x = random.uniform(0, self.width)
+            y = random.uniform(0, self.height)
+            angle = random.uniform(0, 2 * math.pi)
+            dx = self.movement_speed * math.cos(angle)
+            dy = self.movement_speed * math.sin(angle)
+            state = 'I' if i < self.initial_infected else 'S'
+            self.population.append(Agent(x, y, dx, dy, state))
+
+    def update(self):
+        # Runs one step of the simulation: move agents, spead infection, update recovery
+
+        # Move all agents
+        for agent in self.population:
+            agent.move(self.width, self.height)
+
+        # Spread Infection
+        for i, a in enumerate(self.population):
+            if a.state != 'I':
+                continue
+            for j, b in enumerate(self.population):
+                if i == j or b.state != 'S':
+                    continue
+                dist = math.hypot(a.x - b.x, a.y - b.y)
+                if dist <= self.infection_distance and random.random() < self.infection_rate:
+                    b.infect()
+
+        # Handle recovery
+        for agent in self.population:
+            if agent.state == 'I':
+                agent.infection_timer += 1
+                if agent.infection_timer >= self.recovery_time:
+                    agent.recover()
+
+    def count_states(self):
+        # Returns a tuple of counts: (Susceptible, Infected, Recovered)
+        s = sum(1 for a in self.population if a.state == 'S')
+        i = sum(1 for a in self.population if a.state == 'I')
+        r = sum(1 for a in self.population if a.state == 'R')
+        return s, i, r
+
+-- controls.py 
+# GUI Tool Kit and Tool
+import tkinter as tk
+from tkinter import ttk
+
+# Builds the control panel for a parent widget
+def create_controls(parent):
+    outer_frame = ttk.Frame(parent, padding = "10")     # Creates an outer frame, like a literal frame
+    flex_frame = ttk.Frame(outer_frame)                 # Creates an inner frame, like the border on a nice frame that holds the art
+    flex_frame.pack(anchor = "center")                  # Centers all the content and keeps it that way when window is resized
+
+    # Dictionary that holds the parameter labels and dummy values
+    params = {
+        "Population Size": tk.IntVar(value = 100),
+        "Initial Infected": tk.IntVar(value = 5),
+        "Infection Rate": tk.DoubleVar(value = 25.0),
+        "Recovery Time": tk.IntVar(value = 100),
+        "Movement Speed": tk.DoubleVar(value = 2.0)
+    }
+
+    # Create the labels and text areas
+    for label, var in params.items():
+        group = ttk.Frame(flex_frame)                               # Assign content to a group
+        group.pack(side = "left", padx = 5)                         # Content is left oriented
+        ttk.Label(group, text = label).pack(anchor = "w")           # Create label, left oriented
+        ttk.Entry(group, textvariable = var, width = 10).pack()     # Create text area
+    
+    # Dummy Buttons 
+    button_group = ttk.Frame(flex_frame)                            # Buttons belong to the same frame
+    button_group.pack(side = "left", padx = 20)                     # Left oriented with some space from the user input
+
+    # Buttons
+    start_button = ttk.Button(button_group, text = "Start")
+    start_button.pack(side = "left", padx = 2)
+
+    pause_button = ttk.Button(button_group, text = "Pause")
+    pause_button.pack(side = "left", padx = 2)
+
+    reset_button = ttk.Button(button_group, text = "Reset")
+    reset_button.pack(side = "left", padx = 2)
+
+    # Return the control center
+    return outer_frame, params, start_button, pause_button, reset_button
+
+-- simulation_canvas.py 
+# GUI Tool Kit
+import tkinter as tk
+
+# Define custom class that inherits tk.canvas
+class SimulationCanvas(tk.Canvas):
+    # Intitializes a blank white 400x700 canvas
+    def __init__(self, parent, width = 400, height = 700):
+        super().__init__(parent, width = width, height = height, bg = "white")
+        # Placeholder that shows content inside the canvas
+        self.create_text(width//2, height//2, font = ("Arial", 16), fill = "black")
+
+-- graph.py 
+import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import numpy as np
+
+# matplotlib.use("Agg")
+
+class SIRGraph(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        # Create a figure and axis
+        self.fig, self.ax = plt.subplots(figsize = (5, 3.5), dpi = 100)
+        self.fig.tight_layout()
+        self.ax.set_title("SIR Model Over Time", fontsize = 10)
+        self.ax.set_xlabel("Time Steps", fontsize = 9)
+        self.ax.set_ylabel("Population", fontsize = 9)
+        self.ax.tick_params(labelsize = 8)
+        self.ax.grid(True)
+
+        # Dummy time axis and initial lines
+        self.x_data = list(range(100))
+        self.s_data = [np.sin(x / 10) * 50 + 150 for x in self.x_data]
+        self.i_data = [np.cos(x / 10) * 40 + 100 for x in self.x_data]
+        self.r_data = [200 - s - i for s, i in zip(self.s_data, self.i_data)]
+
+        self.s_line = self.ax.plot(self.x_data, self.s_data, label = "Susceptible", color = "blue")
+        self.i_line = self.ax.plot(self.x_data, self.i_data, label = "Infected",    color = "red")
+        self.r_line = self.ax.plot(self.x_data, self.r_data, label = "Recovered",   color = "green")
+
+        self.ax.legend()
+
+        # Embed in tkinter frame
+        self.canvas = FigureCanvasTkAgg(self.fig, master = self)
+        self.canvas.get_tk_widget().pack(fill = tk.BOTH, expand = True)
+        self.canvas.draw()
+
+    def update_graph(self, new_s, new_i, new_r):
+        """Call this with new y-data lists to update graph"""
+        if len(new_s) != len(self.x_data):
+            print("[SIRGraph] Warning: Data length mismatch")
+            return
+        
+        self.s_line.set_ydata(new_s)
+        self.i_line.set_ydata(new_i)
+        self.r_line.set_ydata(new_r)
+        self.canvas.draw()

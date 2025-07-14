@@ -75,7 +75,7 @@ def main():
         simulation.update()
         draw_agents()
         s, i, r = simulation.count_states()
-        #graph.add_points(time_step, s, i, r)
+        graph.add_points(time_step, s, i, r)
         status_label.config(text = f"Time: {time_step} | S: {s} | I: {i} | R: {r}")
         time_step += 1
         loop_id = root.after(33, update)
@@ -119,7 +119,7 @@ def main():
         simulation.initial_infected = int(params["Initial Infected"].get())
         simulation.infection_rate = float(params["Infection Rate"].get())
         simulation.recovery_time = int(params["Recovery Time"].get())
-        simulation.movement_speed = float(params["Movement Speed"],get())
+        simulation.movement_speed = float(params["Movement Speed"].get())
         simulation.initialize_population()
         draw_agents()
 
