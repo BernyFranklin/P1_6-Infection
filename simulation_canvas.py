@@ -7,4 +7,4 @@ class SimulationCanvas(tk.Canvas):
     def __init__(self, parent, width = 400, height = 700):
         super().__init__(parent, width = width, height = height, bg = "white")
         # Placeholder that shows content inside the canvas
-        self.create_text(width//2, height//2, text = "Simulation Area", font = ("Arial", 16), fill = "black")
+        self.create_text(width//2, height//2, font = ("Arial", 16), fill = "black")

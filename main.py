@@ -1,4 +1,5 @@
 import tkinter as tk
+import pygame
 from tkinter import ttk
 from controls import create_controls
 from simulation_canvas import SimulationCanvas
@@ -8,6 +9,8 @@ from simulation_engine import SIRSimulation
 def main():
     # Set up root
     root = tk.Tk()
+    pygame.mixer.init()
+    pygame.mixer.music.load("retro-game-music-245230.mp3")
     root.title("SIR Infection Simulation")
     root.resizable(True, True)                  # Needs to be True for use on laptop displays, otherwise its tiny
     root.grid_rowconfigure(1, weight = 1)
@@ -72,7 +75,7 @@ def main():
         simulation.update()
         draw_agents()
         s, i, r = simulation.count_states()
-        graph.add_points(time_step, s, i, r)
+        #graph.add_points(time_step, s, i, r)
         status_label.config(text = f"Time: {time_step} | S: {s} | I: {i} | R: {r}")
         time_step += 1
         loop_id = root.after(33, update)
@@ -80,14 +83,25 @@ def main():
     def start():
         nonlocal running, loop_id, time_step
         if not running:
+            if time_step == 0:
+                simulation.population_size = int(params["Population Size"].get())
+                simulation.initial_infected = int(params["Initial Infected"].get())
+                simulation.infection_rate = float(params["Infection Rate"].get())
+                simulation.recovery_time = int(params["Recovery Time"].get())
+                simulation.movement_speed = float(params["Movement Speed"].get())
+                simulation.initialize_population()
+                draw_agents()
+                pygame.mixer.music.play(-1)
+            else:
+                pygame.mixer.music.unpause()
             running = True
-            time_step = 0
             update()
 
     def pause():
         nonlocal running, loop_id 
         if running and loop_id:
             root.after_cancel(loop_id)
+            pygame.mixer.music.pause()
             loop_id = None 
             running = False
 
@@ -96,6 +110,7 @@ def main():
         if running and loop_id:
             root.after_cancel(loop_id)
         running = False
+        pygame.mixer.music.stop()
         time_step = 0
         canvas.delete("all")
         graph.clear()

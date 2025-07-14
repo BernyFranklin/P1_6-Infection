@@ -81,7 +81,7 @@ class SIRSimulation:
         # Handle recovery
         for agent in self.population:
             if agent.state == 'I':
-                agent.infection_time += 1
+                agent.infection_timer += 1
                 if agent.infection_timer >= self.recovery_time:
                     agent.recover()
 
