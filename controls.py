@@ -12,7 +12,7 @@ def create_controls(parent):
     params = {
         "Population Size": tk.IntVar(value = 100),
         "Initial Infected": tk.IntVar(value = 5),
-        "Infection Rate": tk.DoubleVar(value = 25.0),
+        "Infection Rate (%)": tk.DoubleVar(value = 25.0),
         "Recovery Time": tk.IntVar(value = 100),
         "Movement Speed": tk.DoubleVar(value = 2.0)
     }

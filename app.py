@@ -67,6 +67,8 @@ class App:
         self.simulation.population_size = int(self.params["Population Size"].get())
         self.simulation.initial_infected = int(self.params["Initial Infected"].get())
         self.simulation.infection_rate = float(self.params["Infection Rate"].get())
+        # Convert to value between 0 and 1
+        self.simulation.infection_rate = max(0.0, min(self.simulation.infection_rate / 100, 1.0))
         self.simulation.recovery_time = int(self.params["Recovery Time"].get())
         self.simulation.movement_speed = float(self.params["Movement Speed"].get())
         self.simulation.initialize_population()
