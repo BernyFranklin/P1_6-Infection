@@ -2,6 +2,7 @@ import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
 
 # matplotlib.use("Agg")
 
@@ -50,6 +51,14 @@ class SIRGraph(tk.Frame):
 
         self.canvas.draw()
 
+    def export(self, filename = "sir_graph.png"):
+        # Attempt to export
+        try:
+            self.fig.savefig(filename, dpi = 300)
+            print(f"Graph saved as: {filename}")
+        except Exception as e:
+            print(f"error: {e}")
+            
     def clear(self):
         self.x_data.clear()
         self.s_data.clear()

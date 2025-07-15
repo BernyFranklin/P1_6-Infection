@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import ttk, messagebox, filedialog, Toplevel
 import pygame
 from controls import create_controls
 from simulation_canvas import SimulationCanvas
@@ -101,9 +100,15 @@ class App:
         self.status_label.config(text = f"Time: {self.time_step} | S: {s} | I: {i} | R: {r}")
 
     def _sim_complete(self, s, r):
-        messagebox.showinfo(
-            title = "Simulation Complete",
-            message = (
+        # Create pop-up window
+        popup = Toplevel(self.root)
+        popup.title("Simulation Complete")
+        popup.geometry("320x250")
+        popup.resizable(False, False)
+        popup.grab_set()
+
+        # Summary message
+        summary = (
                 f"The epidemic has ended.\n\n"
                 f"Total time steps: {self.time_step}\n"
                 f"Susceptible: {s}\n"
@@ -112,7 +117,14 @@ class App:
                 f"Congratulations\n"
                 f"The population survived!"
             )
-        )
+        
+        # Buttons
+        label = tk.Label(popup, text = summary, justify = "left", padx = 15, pady = 10)
+        label.pack()
+        export_btn = tk.Button(popup, text = "Export Graph", command = self.export_graph)
+        export_btn.pack(pady = (5, 0))
+        close_btn = tk.Button(popup, text = "Close", command = popup.destroy)
+        close_btn.pack(pady = (5, 10))
 
     def update(self):
         self.simulation.update()
@@ -155,7 +167,8 @@ class App:
     def pause(self):
         if self.running and self.loop_id:
             self.root.after_cancel(self.loop_id)
-            pygame.mixer.music.pause()
+            if self.audio_ok:
+                pygame.mixer.music.pause()
             self.loop_id = None 
             self.running = False
 
@@ -163,11 +176,23 @@ class App:
         if self.running and self.loop_id:
             self.root.after_cancel(self.loop_id)
         self.running = False
-        pygame.mixer.music.stop()
+        if self.audio_ok:
+            pygame.mixer.music.stop()
         self.time_step = 0
         self.canvas.delete("all")
         self.graph.clear()
         self.status_label.config(text = "Time: 0 | S: 0 | I: 0 | R: 0")
+
+    def export_graph(self):
+        file_path = filedialog.asksaveasfilename(
+            defaultextension = ".png",
+            filetypes = [("PNG files", "*.png"), ("All files", "*.*")],
+            title = "Save Graph As"
+        )
+
+        if file_path:
+            self.graph.export(file_path)
+            messagebox.showinfo("Export Complete", f"Graph saved as:\n{file_path}")
 
     def run(self):
         self.root.mainloop()
