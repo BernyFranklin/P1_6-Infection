@@ -1,0 +1,125 @@
+import tkinter as tk
+from tkinter import ttk
+import pygame
+from controls import create_controls
+from simulation_canvas import SimulationCanvas
+from graph import SIRGraph
+from simulation_engine import SIRSimulation
+
+class App:
+    def __init__(self):
+        # Set up root window
+        self.root = tk.Tk()
+        self.root.title("SIR Infection Simulation")
+        self.root.resizable(True, True) 
+        self.root.grid_rowconfigure(1, weight = 1)
+        self.root.grid_columnconfigure(0, weight = 1)
+
+        # Pygame music set up
+        pygame.mixer.init()
+        pygame.mixer.music.load("12a Athletic.mp3")
+
+        # Control Panel
+        self.controls_frame, self.params, self.start_btn, self.pause_btn, self.reset_btn  = create_controls(self.root)
+        self.controls_frame.grid(row = 0, column = 0, sticky = "ew", padx = 10, pady = (10, 5))
+
+        # Main layout frame
+        self.sim_and_graph = ttk.Frame(self.root, padding = 0)
+        self.sim_and_graph.grid(row = 1, column = 0)
+        self.sim_and_graph.grid_columnconfigure(0, weight = 1)
+        self.sim_and_graph.grid_columnconfigure(1, weight = 1)
+        self.sim_and_graph.grid_rowconfigure(0, weight = 1)
+
+        # Canvas
+        self.canvas_width = 275
+        self.canvas_height = 650
+        self.canvas_frame = ttk.Frame(self.sim_and_graph, width = self.canvas_width + 5, height = self.canvas_height + 5)
+        self.canvas_frame.grid(row = 0, column = 0, sticky = "nsew", padx = 10)
+        self.canvas_frame.grid_propagate(False)
+        self.canvas = SimulationCanvas(self.canvas_frame)
+        self.canvas.place(x = 0, y = 0, width= self.canvas_width, height= self.canvas_height)
+
+        # Graph
+        self.graph = SIRGraph(self.sim_and_graph)
+        self.graph.grid(row = 0, column = 1, sticky = "nsew", padx = 10)
+
+        # Status label
+        self.status_label = tk.Label(self.root, text = "Time: 0 | S: 0 | I: 0 | R: 0", padx = 5)
+        self.status_label.grid(row = 2, column = 0, sticky = "w", padx = 10)
+
+        # Sim setup
+        self.simulation = SIRSimulation(width = self.canvas_width, height = self.canvas_height)
+        self.running = False
+        self.time_step = 0
+        self.loop_id = None
+
+        # Button bindings
+        self.start_btn.config(command = self.start)
+        self.pause_btn.config(command = self.pause)
+        self.reset_btn.config(command = self.reset)
+
+    def draw_agents(self):
+        self.canvas.delete("agent")
+        for agent in self.simulation.population:
+            color = {"S": "blue", "I": "red", "R": "green"}[agent.state]
+            radius = 3
+            self.canvas.create_oval(
+                agent.x - radius, agent.y - radius,
+                agent.x + radius, agent.y + radius,
+                fill = color, outline = "", tags = "agent"
+            )
+
+    def update(self):
+        self.simulation.update()
+        self.draw_agents()
+        s, i, r = self.simulation.count_states()
+        self.graph.add_points(self.time_step, s, i, r)
+        self.status_label.config(text = f"Time: {self.time_step} | S: {s} | I: {i} | R: {r}")
+        self.time_step += 1
+        self.loop_id = self.root.after(33, self.update)
+
+    def start(self):
+        if not self.running:
+            if self.time_step == 0:
+                self.simulation.population_size = int(self.params["Population Size"].get())
+                self.simulation.initial_infected = int(self.params["Initial Infected"].get())
+                self.simulation.infection_rate = float(self.params["Infection Rate"].get())
+                self.simulation.recovery_time = int(self.params["Recovery Time"].get())
+                self.simulation.movement_speed = float(self.params["Movement Speed"].get())
+                self.simulation.initialize_population()
+                self.draw_agents()
+                pygame.mixer.music.play(-1)
+            else:
+                pygame.mixer.music.unpause()
+            self.running = True
+            self.update()
+
+    def pause(self):
+        if self.running and self.loop_id:
+            self.root.after_cancel(self.loop_id)
+            pygame.mixer.music.pause()
+            self.loop_id = None 
+            self.running = False
+
+    def reset(self):
+        if self.running and self.loop_id:
+            self.root.after_cancel(self.loop_id)
+        self.running = False
+        pygame.mixer.music.stop()
+        self.time_step = 0
+        self.canvas.delete("all")
+        self.graph.clear()
+        self.status_label.config(text = "Time: 0 | S: 0 | I: 0 | R: 0")
+
+    def run(self):
+        self.root.mainLoop()
+
+    #simulation.population_size = int(params["Population Size"].get())
+    #simulation.initial_infected = int(params["Initial Infected"].get())
+    #simulation.infection_rate = float(params["Infection Rate"].get())
+    #simulation.recovery_time = int(params["Recovery Time"].get())
+    #simulation.movement_speed = float(params["Movement Speed"].get())
+    #simulation.initialize_population()
+
+    # Debug print to confirm values
+    #s, i, r = simulation.count_states()
