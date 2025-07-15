@@ -24,11 +24,10 @@ def create_controls(parent):
         ttk.Label(group, text = label).pack(anchor = "w")           # Create label, left oriented
         ttk.Entry(group, textvariable = var, width = 10).pack()     # Create text area
     
-    # Dummy Buttons 
+    # Buttons 
     button_group = ttk.Frame(flex_frame)                            # Buttons belong to the same frame
     button_group.pack(side = "left", padx = 20)                     # Left oriented with some space from the user input
 
-    # Buttons
     start_button = ttk.Button(button_group, text = "Start")
     start_button.pack(side = "left", padx = 2)
 
