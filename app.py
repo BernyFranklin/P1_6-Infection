@@ -72,6 +72,7 @@ class App:
         self.simulation.initialize_population()
 
     def _init_music(self):
+        self.audio_ok = True
         try:
             pygame.mixer.init()
             # BG Music
@@ -81,6 +82,7 @@ class App:
         except pygame.error as e:
             print(f"[Audio Error] {e}")
             self.sucess_sound = None
+            self.audio_ok = False
 
 
     def draw_agents(self):
@@ -107,9 +109,12 @@ class App:
 
         # Check for Epidemic Burnout
         if i == 0:
+            # Stop sim
             self.running = False
-            pygame.mixer.music.stop()
-            self.sucess_sound.play()
+            # Audio check
+            if self.audio_ok:
+                pygame.mixer.music.stop()
+                self.sucess_sound.play()
 
             self.status_label.config(text = f"Simulation ended at time {self.time_step} | Final S: {s} | I: 0 | R: {r}")
             return
@@ -121,9 +126,11 @@ class App:
             if self.time_step == 0:
                 self._init_simulation()
                 self.draw_agents()
-                pygame.mixer.music.play(-1)
+                if self.audio_ok:
+                    pygame.mixer.music.play(-1)
             else:
-                pygame.mixer.music.unpause()
+                if self.audio_ok:
+                    pygame.mixer.music.unpause()
             self.running = True
             self.update()
 
