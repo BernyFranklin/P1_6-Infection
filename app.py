@@ -72,8 +72,16 @@ class App:
         self.simulation.initialize_population()
 
     def _init_music(self):
-        pygame.mixer.init()
-        pygame.mixer.music.load("12a Athletic.mp3")
+        try:
+            pygame.mixer.init()
+            # BG Music
+            pygame.mixer.music.load("12a Athletic.mp3")
+            # Success Sound
+            self.sucess_sound = pygame.mixer.Sound("24 Course Clear.mp3")
+        except pygame.error as e:
+            print(f"[Audio Error] {e}")
+            self.sucess_sound = None
+
 
     def draw_agents(self):
         self.canvas.delete("agent")
@@ -96,6 +104,16 @@ class App:
         self.graph.add_points(self.time_step, s, i, r)
         self._update_status(s, i, r)
         self.time_step += 1
+
+        # Check for Epidemic Burnout
+        if i == 0:
+            self.running = False
+            pygame.mixer.music.stop()
+            self.sucess_sound.play()
+
+            self.status_label.config(text = f"Simulation ended at time {self.time_step} | Final S: {s} | I: 0 | R: {r}")
+            return
+
         self.loop_id = self.root.after(33, self.update)
 
     def start(self):
