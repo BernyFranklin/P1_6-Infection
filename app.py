@@ -107,6 +107,19 @@ class App:
         popup.resizable(False, False)
         popup.grab_set()
 
+        # Center the pop-up
+        self.root.update_idletasks()  # Ensure window sizes are calculated
+        main_x = self.root.winfo_x()
+        main_y = self.root.winfo_y()
+        main_w = self.root.winfo_width()
+        main_h = self.root.winfo_height()
+
+        popup_w = 320
+        popup_h = 250
+        pos_x = main_x + (main_w // 2) - (popup_w // 2)
+        pos_y = main_y + (main_h // 2) - (popup_h // 2)
+        popup.geometry(f"{popup_w}x{popup_h}+{pos_x}+{pos_y}")
+
         # Summary message
         summary = (
                 f"The epidemic has ended.\n\n"
