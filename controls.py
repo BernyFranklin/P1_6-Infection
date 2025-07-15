@@ -22,7 +22,7 @@ def create_controls(parent):
         group = ttk.Frame(flex_frame)                               # Assign content to a group
         group.pack(side = "left", padx = 5)                         # Content is left oriented
         ttk.Label(group, text = label).pack(anchor = "w")           # Create label, left oriented
-        ttk.Entry(group, textvariable = var, width = 10).pack()     # Create text area
+        ttk.Entry(group, textvariable = var, width = 15).pack()     # Create text area
     
     # Buttons 
     button_group = ttk.Frame(flex_frame)                            # Buttons belong to the same frame

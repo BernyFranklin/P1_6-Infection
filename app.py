@@ -66,7 +66,7 @@ class App:
     def _init_simulation(self):
         self.simulation.population_size = int(self.params["Population Size"].get())
         self.simulation.initial_infected = int(self.params["Initial Infected"].get())
-        self.simulation.infection_rate = float(self.params["Infection Rate"].get())
+        self.simulation.infection_rate = float(self.params["Infection Rate (%)"].get())
         # Convert to value between 0 and 1
         self.simulation.infection_rate = max(0.0, min(self.simulation.infection_rate / 100, 1.0))
         self.simulation.recovery_time = int(self.params["Recovery Time"].get())
@@ -158,7 +158,7 @@ class App:
                 pygame.mixer.music.stop()
                 self.sucess_sound.play()
             # Update status labels and activate pop up
-            self.status_label.config(text = f"Simulation ended at time {self.time_step} | Final S: {s} | I: 0 | R: {r}")
+            self.status_label.config(text = f"Simulation ended, final values: Time: {self.time_step} | S: {s} | I: 0 | R: {r}")
             # Finish updating status count and drawing final agents
             self.root.update_idletasks()    
             self._sim_complete(s, r)
