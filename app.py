@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, Toplevel
 import pygame
+import datetime
 from controls import create_controls
 from simulation_canvas import SimulationCanvas
 from graph import SIRGraph
@@ -199,8 +200,13 @@ class App:
         self.status_label.config(text = "Time: 0 | S: 0 | I: 0 | R: 0")
 
     def export_graph(self):
+        # Set up a default file name
+        timestamp = datetime.datetime.now().strftime("%d%B%Y_%H.%M.%S")
+        default_filename = f"graph_{timestamp}.png"
+
         file_path = filedialog.asksaveasfilename(
             defaultextension = ".png",
+            initialfile = default_filename,
             filetypes = [("PNG files", "*.png"), ("All files", "*.*")],
             title = "Save Graph As"
         )
