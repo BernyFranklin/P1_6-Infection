@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import pygame
 from controls import create_controls
 from simulation_canvas import SimulationCanvas
@@ -99,6 +100,20 @@ class App:
     def _update_status(self, s, i, r):
         self.status_label.config(text = f"Time: {self.time_step} | S: {s} | I: {i} | R: {r}")
 
+    def _sim_complete(self, s, r):
+        messagebox.showinfo(
+            title = "Simulation Complete",
+            message = (
+                f"The epidemic has ended.\n\n"
+                f"Total time steps: {self.time_step}\n"
+                f"Susceptible: {s}\n"
+                f"Infected: 0\n"
+                f"Recovered: {r}\n\n"
+                f"Congratulations\n"
+                f"The population survived!"
+            )
+        )
+
     def update(self):
         self.simulation.update()
         self.draw_agents()
@@ -115,8 +130,11 @@ class App:
             if self.audio_ok:
                 pygame.mixer.music.stop()
                 self.sucess_sound.play()
-
+            # Update status labels and activate pop up
             self.status_label.config(text = f"Simulation ended at time {self.time_step} | Final S: {s} | I: 0 | R: {r}")
+            # Finish updating status count and drawing final agents
+            self.root.update_idletasks()    
+            self._sim_complete(s, r)
             return
 
         self.loop_id = self.root.after(33, self.update)
