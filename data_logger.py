@@ -18,7 +18,7 @@ def log_step(timestep, susceptible, infected, recovered):
         'recovered': recovered
     })
 
-def save_log(scenario_label="RapidOutbreak", directory="data"):
+def save_log(scenario_label="BalancedSpread", directory="data"):
     global _log_data
 
     if not os.path.exists(directory):
