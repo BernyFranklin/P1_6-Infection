@@ -16,7 +16,7 @@ class App:
         self._setup_gui()
         self._bind_controls()
         self._init_music()
-        init_log()
+        #init_log()
         
     def _setup_root(self):
         # Set up root window
@@ -149,7 +149,7 @@ class App:
         self.simulation.update()
         self.draw_agents()
         s, i, r = self.simulation.count_states()
-        log_step(self.time_step, s, i, r)
+        #log_step(self.time_step, s, i, r)
         self.graph.add_points(self.time_step, s, i, r)
         self._update_status(s, i, r)
         self.time_step += 1
@@ -167,7 +167,7 @@ class App:
             # Finish updating status count and drawing final agents
             self.root.update_idletasks()    
             self._sim_complete(s, r)
-            save_log()
+            #save_log()
             return
 
         self.loop_id = self.root.after(33, self.update)
