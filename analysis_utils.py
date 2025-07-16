@@ -51,7 +51,11 @@ def average_peak_infected(folder_path):
     peaks = [peak_infected(f) for f in glob.glob(os.path.join(folder_path, "*.csv"))]
     return sum(peaks) / len(peaks)
 
-def peak_infected(folder_path):
+def peak_infected(filepath):
+    df = pd.read_csv(filepath)
+    return df['infected'].max()
+
+def peak_infected_in_folder(folder_path):
     peak = 0
     for file in glob.glob(os.path.join(folder_path, "*.csv")):
         df = pd.read_csv(file)

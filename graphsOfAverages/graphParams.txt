@@ -13,6 +13,7 @@ Milestones
 ----------------------------------
 Average Outbreak Duration: 397.1
 Peak Infected: 96
+Average Peak Infected: 89.3
 
 ==================================
 Rapid Outbreak
@@ -29,6 +30,7 @@ Milestones
 ----------------------------------
 Average Outbreak Duration: 193.9
 Peak Infected: 104
+Average Peak Infected: 100.4
 
 ==================================
 Slow Spread
@@ -45,3 +47,4 @@ Milestones
 ------------------------
 Average Outbreak Duration: 602.2
 Peak Infected: 36
+Average Peak Infected: 25.4
