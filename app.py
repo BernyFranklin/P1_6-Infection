@@ -1,3 +1,10 @@
+
+# Frank Bernal, Noah Wiley, Anthony Sayre
+# CSci-154
+# Prof. Herdman
+# P1_6-Infection
+# app.py
+
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, Toplevel
 import pygame

@@ -1,3 +1,9 @@
+# Frank Bernal, Noah Wiley, Anthony Sayre
+# CSci-154
+# Prof. Herdman
+# P1_6-Infection
+# data_logger.py
+
 import csv
 import os
 from datetime import datetime

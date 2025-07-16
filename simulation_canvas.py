@@ -1,3 +1,9 @@
+# Frank Bernal, Noah Wiley, Anthony Sayre
+# CSci-154
+# Prof. Herdman
+# P1_6-Infection
+# simulation_canvas.py
+
 # GUI Tool Kit
 import tkinter as tk
 

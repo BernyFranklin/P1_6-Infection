@@ -1,3 +1,9 @@
+# Frank Bernal, Noah Wiley, Anthony Sayre
+# CSci-154
+# Prof. Herdman
+# P1_6-Infection
+# analysis_util.py
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob

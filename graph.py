@@ -1,8 +1,13 @@
+# Frank Bernal, Noah Wiley, Anthony Sayre
+# CSci-154
+# Prof. Herdman
+# P1_6-Infection
+# graph.py
+
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import numpy as np
-import datetime
 
 # matplotlib.use("Agg")
 

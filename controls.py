@@ -1,4 +1,9 @@
-# GUI Tool Kit and Tool
+# Frank Bernal, Noah Wiley, Anthony Sayre
+# CSci-154
+# Prof. Herdman
+# P1_6-Infection
+# controls.py
+
 import tkinter as tk
 from tkinter import ttk
 

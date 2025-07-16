@@ -4,7 +4,7 @@ Balanced Spread
 Parameters
 ----------------------------------
 Population Size: 200
-Initial Infected: 10
+Initial Infected: 10 (5% of population)
 Infection Rate (%): 40.0
 Recovery Time: 60 
 Movement Speed: 2.0
@@ -21,7 +21,7 @@ Rapid Outbreak
 Parameters
 ----------------------------------
 Population Size: 200
-Initial Infected: 20
+Initial Infected: 20 (10% of population)
 Infection Rate (%): 80.0
 Recovery Time: 30 
 Movement Speed: 3.0
@@ -38,7 +38,7 @@ Slow Spread
 Parameters
 ----------------------------------
 Population Size: 200
-Initial Infected: 6
+Initial Infected: 6 (3% of population)
 Infection Rate (%): 15.0
 Recovery Time: 120 
 Movement Speed: 0.5
