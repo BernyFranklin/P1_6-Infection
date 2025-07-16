@@ -1,0 +1,47 @@
+==================================
+Balanced Spread
+==================================
+Parameters
+----------------------------------
+Population Size: 200
+Initial Infected: 10
+Infection Rate (%): 40.0
+Recovery Time: 60 
+Movement Speed: 2.0
+
+Milestones
+----------------------------------
+Average Outbreak Duration: 397.1
+Peak Infected: 96
+
+==================================
+Rapid Outbreak
+==================================
+Parameters
+----------------------------------
+Population Size: 200
+Initial Infected: 20
+Infection Rate (%): 80.0
+Recovery Time: 30 
+Movement Speed: 3.0
+
+Milestones
+----------------------------------
+Average Outbreak Duration: 193.9
+Peak Infected: 104
+
+==================================
+Slow Spread
+==================================
+Parameters
+----------------------------------
+Population Size: 200
+Initial Infected: 6
+Infection Rate (%): 15.0
+Recovery Time: 120 
+Movement Speed: 0.5
+
+Milestones
+------------------------
+Average Outbreak Duration: 602.2
+Peak Infected: 36

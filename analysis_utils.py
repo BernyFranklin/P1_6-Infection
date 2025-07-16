@@ -38,3 +38,24 @@ def plot_sir_curve(avg_df, scenario_name="Scenario"):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+def average_outbreak_duration(folder_path):
+    durations = []
+    for file in glob.glob(os.path.join(folder_path, "*.csv")):
+        df = pd.read_csv(file)
+        last_nonzero = df[df['infected'] > 0]['timestep'].max()
+        durations.append(last_nonzero)
+    return sum(durations) / len(durations) if durations else 0
+
+def average_peak_infected(folder_path):
+    peaks = [peak_infected(f) for f in glob.glob(os.path.join(folder_path, "*.csv"))]
+    return sum(peaks) / len(peaks)
+
+def peak_infected(folder_path):
+    peak = 0
+    for file in glob.glob(os.path.join(folder_path, "*.csv")):
+        df = pd.read_csv(file)
+        run_peak = df['infected'].max()
+        if run_peak > peak:
+            peak = run_peak
+    return peak
